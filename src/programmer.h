@@ -227,18 +227,28 @@ static BitBangedSPI SPI;
 
 #endif
 
-void programmer_stop()
+bool programmer_running = false;
+
+void programmer_end()
 {
+  if (!programmer_running)
+    return;
+
   //start serial for programmer
   SERIAL.end();
 
   digitalWrite(LED_PMODE, LOW);
   digitalWrite(LED_ERR, LOW);
   digitalWrite(LED_HB, LOW);
+
+  programmer_running = false;
 }
 
-void programmer_start()
+void programmer_begin()
 {
+  if (programmer_running)
+    return;
+
   //flush serial
   while (SERIAL && SERIAL.available())
   {
@@ -250,6 +260,8 @@ void programmer_start()
   pulse(LED_PMODE, 2);
   pulse(LED_ERR, 2);
   pulse(LED_HB, 2);
+
+  programmer_running = true;
 }
 
 void programmer_setup()
@@ -312,6 +324,9 @@ void reset_target(bool reset)
 
 void programmer_loop(void)
 {
+  if (!programmer_running)
+    return;
+
   // is pmode active?
   if (pmode)
   {

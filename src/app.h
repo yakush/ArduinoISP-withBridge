@@ -8,13 +8,16 @@
 
 enum t_state
 {
+    NONE,
     PROGRAMMER,
     BRIDGE,
 };
 
 //-------------------------------------------------------
 // vars
-t_state state = PROGRAMMER;
+t_state state = NONE;
+t_state stateRequest = NONE;
+
 FastButton btnProgrammer;
 FastButton btnBridge;
 //-------------------------------------------------------
@@ -25,12 +28,10 @@ void setup()
     btnBridge.begin(PIN_BTN_BRIDGE);
 
     programmer_setup();
-    bridge_setup();
+    Bridge.setup();
 
     //start with programmer mode
-    state = PROGRAMMER;
-    bridge_stop();
-    programmer_start();
+    stateRequest = PROGRAMMER;
 }
 
 void loop()
@@ -38,34 +39,42 @@ void loop()
     // Serial.println("hello");
     // return;
 
+    //check buttons and request state change:
     btnProgrammer.update();
     btnBridge.update();
-    
-    // if (btnProgrammer.fell())
-    // {
-    //     Serial.println("btn programmer");
-    // }
-    // if (btnBridge.fell())
-    // {
-    //     Serial.println("btn bridge");
-    // }
 
-    if (state != PROGRAMMER && btnProgrammer.fell())
+    if (btnProgrammer.fell())
+        stateRequest = PROGRAMMER;
+    else if (btnBridge.fell())
+        stateRequest = BRIDGE;
+
+    //TODO: if self programming is pressed - set to none, if released - restore to previous state
+
+    //update state if needed:
+    if (stateRequest != state)
     {
-        state = PROGRAMMER;
-        bridge_stop();
-        programmer_start();
+        switch (stateRequest)
+        {
+        case PROGRAMMER:
+            Bridge.end();
+            programmer_begin();
+            break;
+
+        case BRIDGE:
+            programmer_end();
+            Bridge.begin();
+            break;
+
+        case NONE:
+            programmer_end();
+            Bridge.end();
+            break;
+        }
+
+        state = stateRequest;
     }
-    else if (state != BRIDGE && btnBridge.fell())
-    {
-        state = BRIDGE;
-        programmer_stop();
-        bridge_start();
-    }
-    
-    // -- loop select
-    if (state == PROGRAMMER)
-        programmer_loop();
-    else if (state == BRIDGE)
-        bridge_loop();
+
+    // -- loops
+    programmer_loop();
+    Bridge.loop();
 }

@@ -6,15 +6,14 @@
  * A6 and A7 can ONLY be used as analog pins!
  */
 // PINS
-#define PIN_BTN_PROGRAMMER (A0)
-#define PIN_BTN_BRIDGE (A1)
-#define PIN_LED_BRIDGE (A2)
+#define PIN_BTN_PROGRAMMER (6)
+#define PIN_BTN_BRIDGE (4)
 
-#define PIN_LED_BRIDGE_RX (A3)
-#define PIN_LED_BRIDGE_TX (A4)
+#define PIN_LED_BRIDGE_HB (3)
+#define PIN_LED_BRIDGE_RX (A0)
+#define PIN_LED_BRIDGE_TX (A1)
+#define PIN_ENABLE_BRIDGE (2)
 
-#define PIN_BRIDGE_RX (2)
-#define PIN_BRIDGE_TX (3)
 #define PIN_NATIVE_RX (0)
 #define PIN_NATIVE_TX (1)
 
